@@ -19,4 +19,6 @@ public interface CollectionService {
     List<Collection> getAllCollections();
     CollectionDto getCollectionById (Long id);
     Collection find(Long id);
+
+    List<CollectionDto> getCollectionByCategory(String category);
 }

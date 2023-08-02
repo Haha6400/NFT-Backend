@@ -2,6 +2,7 @@ package com.nftapp.nftapp.Service.Impl;
 
 import com.nftapp.nftapp.DTO.ItemDto;
 import com.nftapp.nftapp.DTO.UserDto;
+import com.nftapp.nftapp.Model.Item;
 import com.nftapp.nftapp.Model.User;
 import com.nftapp.nftapp.Repository.UserRepo;
 import com.nftapp.nftapp.Service.UserService;
@@ -13,7 +14,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,6 +48,21 @@ public class UserServiceImpl implements UserService {
     public User findByAddress(String address){
         return userRepository.findByAddress(address);
     }
+
+    @Override
+    public UserDto updateUser(User user, String username, String email, BigDecimal balance, String password, Set<Item> favoriteItems, String profileLink, String address, String nonce) {
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setBalance(balance);
+        user.setFavoriteItems(favoriteItems);
+        user.setProfileLink(profileLink);
+        user.setAddress(address);
+        user.setNonce(nonce);
+        user.setPassword(password);
+        User updateUser = userRepository.save(user);
+        return this.modelMapper.map(updateUser, UserDto.class);
+    }
+
     @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);

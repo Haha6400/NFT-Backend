@@ -5,6 +5,7 @@ import com.nftapp.nftapp.Repository.UserRepo;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.web3j.crypto.Keys;
 import org.web3j.crypto.Sign;
+import org.web3j.protocol.Web3j;
 import org.web3j.utils.Numeric;
 import com.nftapp.nftapp.Service.UserService;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -19,6 +20,7 @@ import java.security.SignatureException;
 public class Web3AuthenticationProvider implements AuthenticationProvider {
 
     private final UserService userService;
+
 
     public Web3AuthenticationProvider(UserService userService) {
         this.userService = userService;
@@ -45,6 +47,12 @@ public class Web3AuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+//        if(authentication instanceof Web3Authentication) {
+//            Web3Authentication web3Authentication = (Web3Authentication) authentication;
+//            String address = web3Authentication.getAddress();
+//
+//            Web3j web3j = Web3j.build()
+//        }
         User user = userService.findByAddress(authentication.getName());
         if(user != null){
             String signature = authentication.getCredentials().toString();

@@ -13,4 +13,6 @@ public interface CollectionRepo extends JpaRepository<Collection, String>, JpaSp
     Collection findAllById(Long Id);
 
     List<Collection> searchByName(String s);
+
+    List<Collection> searchCollectionByCategory(String category);
 }

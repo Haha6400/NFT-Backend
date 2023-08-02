@@ -84,6 +84,11 @@ public class CollectionServiceImpl implements CollectionService {
         return collectionRepo.findAllById(id);
     }
 
-
-
+    @Override
+    public List<CollectionDto> getCollectionByCategory(String category) {
+        List<Collection> collections = collectionRepo.searchCollectionByCategory("%" + category + "%");
+        return collections.stream().map((post) ->
+                        this.modelMapper.map(post, CollectionDto.class)).
+                collect(Collectors.toList());
+    }
 }

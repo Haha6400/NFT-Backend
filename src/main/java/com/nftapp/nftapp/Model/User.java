@@ -75,6 +75,7 @@ public class User implements UserDetails {
         return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
     }
 
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

@@ -3,10 +3,12 @@ package com.nftapp.nftapp.Controller;
 import com.nftapp.nftapp.DTO.CollectionDto;
 import com.nftapp.nftapp.DTO.ItemDto;
 import com.nftapp.nftapp.Model.Item;
+import com.nftapp.nftapp.Model.User;
 import com.nftapp.nftapp.Repository.CollectionRepo;
 import com.nftapp.nftapp.Service.FileService;
 import com.nftapp.nftapp.Service.ItemService;
 import com.nftapp.nftapp.Service.UserService;
+import com.nftapp.nftapp.Status;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +24,12 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/items")
+@RequestMapping("/openeye/items")
 @Validated
 public class ItemController {
     @Autowired
@@ -40,48 +43,62 @@ public class ItemController {
     @Value("${project.image}")
     private String path;
 
-    CollectionRepo collectionRepo;
+    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getAllItem(){
+        List<Item> itemList = itemService.getAllItems();
+        Map<Object, Object> map = Map.of("total", itemList.size(), "items", itemList);
+        return ResponseEntity.ok(map);
+    }
 
+    @GetMapping("/{id}")
+    public ItemDto getItemById(@PathVariable("id") Long id) {
+        return itemService.getItemById(id);
+    }
+
+    @GetMapping("/{category}")
+    public ResponseEntity<?> listItemByCategory(@PathVariable("category") String category){
+        List<ItemDto> itemDtoList = itemService.getAllItemsByCategory(category);
+        Map<Object, Object> map = Map.of("total", itemDtoList.size(), "itemList", itemDtoList);
+        return ResponseEntity.ok(map);
+    }
     @PostMapping("/save")
-    public ResponseEntity<Item> saveItem(@Valid @RequestBody Item item, UriComponentsBuilder uriComponentsBuilder) {
-        this.itemService.saveItem(item, item.getPictureLink());
-        UriComponents uriComponents = uriComponentsBuilder.path("/api/v1/items/{id}").buildAndExpand(item.getId());
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .location(uriComponents.toUri())
-                .body(item);
+    public Item createItem(@RequestPart String name,
+                                         @RequestPart String description,
+                                         @RequestPart Double price,
+                                         @RequestPart String category,
+                                         @RequestPart MultipartFile fileImage) throws Exception {
+        ItemDto itemDto = new ItemDto(name, description, price, category, new Date(), Status.NEW);
+        saveItem(fileImage, itemDto);
+        return itemService.save(itemDto);
+    }
+
+    private void saveItem(MultipartFile fileImage,
+                          ItemDto itemDto) throws Exception {
+        String fileName = fileService.updateFile(path, fileImage);
+        itemDto.setPictureLink(fileName);
+    }
+
+    @PutMapping("/update/{id}")
+    public Item updateItem(@RequestPart String name,
+                              @RequestPart String description,
+                              @RequestPart Double price,
+                              @RequestPart String category,
+                              @RequestPart MultipartFile fileImage,
+                              @PathVariable("id") long id) throws Exception {
+        ItemDto itemDto = itemService.getItemById(id);
+        if(itemDto == null) return null;
+        itemDto.setDescription(description);
+        itemDto.setName(name);
+        itemDto.setCategory(category);
+        itemDto.setPrice(price);
+        itemDto.setPictureLink(fileService.updateFile(path, fileImage));
+        return itemService.save(itemDto);
     }
 
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteItemById(@PathVariable("id") Long id){
-        this.itemService.deletePost(id);
-        return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .contentType(MediaType.APPLICATION_JSON)
-                .build();
-    }
-
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ItemDto> insertItem(@RequestBody ItemDto itemDto, @RequestPart MultipartFile image) throws Exception {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(this.itemService.insertItem(itemDto, image));
-    }
-
-    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Item>> getAllItem(){
-        return ResponseEntity.ok(this.itemService.getAllItems());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ItemDto> getItemById(@PathVariable("id") Long id) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(this.itemService.getItemById(id));
+    public void deleteItemById(@PathVariable("id") Long id){
+        itemService.deletePost(id);
     }
 
     @GetMapping("/{name}")

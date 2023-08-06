@@ -19,11 +19,11 @@ public class CollectionDto {
 
     private String description;
 
-    private String category;
+//    private String category;
 
     private Date createdDate;
 
-    private Date syncChainTime;
+    private String slug;
 
     private String pictureLink;
 

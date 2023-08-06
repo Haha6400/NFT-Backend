@@ -15,6 +15,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+@Service
 public class CollectionServiceImpl implements CollectionService {
     private CollectionRepo collectionRepo;
 
@@ -68,9 +70,10 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public List<Collection> getAllCollections() {
-        CollectionQueryCondParam param = new CollectionQueryCondParam();
-        return collectionRepo.findAll(param.buildSpecification(),
-                Sort.by(Sort.Order.desc("createTime")));
+//        CollectionQueryCondParam param = new CollectionQueryCondParam();
+//        return collectionRepo.findAll(param.buildSpecification(),
+//                Sort.by(Sort.Order.desc("createTime")));
+        return collectionRepo.findAll();
     }
 
     @Override

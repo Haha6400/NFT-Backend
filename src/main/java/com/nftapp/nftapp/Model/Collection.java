@@ -31,15 +31,13 @@ public class Collection implements Serializable {
 
     private String description;
 
-    private String category;
-
     private Date createdDate;
-
-    private Date syncChainTime;
 
     private String pictureLink;
 
     private Double volume;
+
+    private String slug;
 
     @ManyToOne
     @JsonIdentityReference(alwaysAsId = true)

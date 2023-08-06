@@ -3,6 +3,7 @@ package com.nftapp.nftapp.DTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.nftapp.nftapp.Model.Item;
+import com.nftapp.nftapp.Model.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -35,11 +36,13 @@ public class UserDto {
     private String password;
 
     private boolean passwordReset;
+    private String confirmPassword;
     private Set<Item> favoriteItems = new HashSet<>();
 
     private String profileLink;
 
     private String address;
+    private Set<Role> roles = new HashSet<>();
 
     public void syncChain(String blockChainAddr) {
         this.setAddress(blockChainAddr);
@@ -53,17 +56,23 @@ public class UserDto {
         return AuthorityUtils.commaSeparatedStringToAuthorityList("ROLE_USER");
     }
 
-    public boolean isAccountNonExpired() {
-        return true;
+    public UserDto(String username, String password, String confirmPassword, String address) {
+        this.username = username;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+        this.address = address;
     }
-
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+//    public boolean isAccountNonExpired() {
+//        return true;
+//    }
+//
+//    public boolean isAccountNonLocked() {
+//        return true;
+//    }
+//
+//    public boolean isCredentialsNonExpired() {
+//        return true;
+//    }
 
     public boolean isEnabled() {
         return true;

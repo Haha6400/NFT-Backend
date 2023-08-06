@@ -6,6 +6,8 @@ import com.nftapp.nftapp.Model.Item;
 import com.nftapp.nftapp.Model.User;
 import com.nftapp.nftapp.Repository.UserRepo;
 import com.nftapp.nftapp.Service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +15,24 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.web3j.crypto.Hash;
+import org.web3j.crypto.Keys;
+import org.web3j.crypto.Sign;
+import org.web3j.utils.Numeric;
+import io.jsonwebtoken.Jwts;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.SignatureException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 @Service
 @Transactional
@@ -26,7 +40,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepo userRepository;
-//    @Autowired
+    //    @Autowired
 //    private RoleRepository roleRepository;
     private BCryptPasswordEncoder passwordEncoder;
 
@@ -49,15 +63,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByAddress(address);
     }
 
+
     @Override
-    public UserDto updateUser(User user, String username, String email, BigDecimal balance, String password, Set<Item> favoriteItems, String profileLink, String address, String nonce) {
+    public UserDto updateUser(User user, String username, String email, BigDecimal balance, String password, Set<Item> favoriteItems, String profileLink, String address, String private_key) {
         user.setUsername(username);
         user.setEmail(email);
         user.setBalance(balance);
         user.setFavoriteItems(favoriteItems);
         user.setProfileLink(profileLink);
         user.setAddress(address);
-        user.setNonce(nonce);
+        user.setPrivateKey(private_key);
         user.setPassword(password);
         User updateUser = userRepository.save(user);
         return this.modelMapper.map(updateUser, UserDto.class);
@@ -114,4 +129,5 @@ public class UserServiceImpl implements UserService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return (UserDetails) userRepository.findByUserName(username);
     }
+
 }

@@ -8,6 +8,9 @@ import com.nftapp.nftapp.Model.User;
 import com.nftapp.nftapp.Repository.UserRepo;
 import com.nftapp.nftapp.Service.FileService;
 import com.nftapp.nftapp.Service.UserService;
+//import io.jsonwebtoken.Jwts;
+//import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,39 +20,34 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 //import ethereumjs.util.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Hash;
+import org.web3j.crypto.Keys;
+import org.web3j.crypto.Sign;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
 import org.slf4j.Logger;
 import org.bouncycastle.util.encoders.Hex;
+import org.web3j.utils.Numeric;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-
+import java.security.SignatureException;
+import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/openeye/user")
 @Validated
 public class UserController {
+    @Autowired
     UserService userService;
-
-    UserRepo userRepo;
-
-    @PostMapping("/login")
-    public String login(@RequestParam String singature, @RequestParam String address){
-        Web3j web3 = Web3j.build(new HttpService("https://mainnet.infura.io/v3/eeb16b22ff7246a1b0e34763b48310c7"));
-        try{
-            Web3ClientVersion web3ClientVersion = web3.web3ClientVersion().sendAsync().get();
-            if(web3ClientVersion.hasError()){
-                return "error";
-            } else return "success";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "error";
-        }
-    }
-
+    @Autowired
     FileService fileService;
     @Value("${project.image}")
     private String path;
@@ -76,7 +74,7 @@ public class UserController {
         User user = userService.getUserByUsername(username);
         if(user == null) return ResponseEntity.ok().body(new Response(false, "Username not found!"));
         String password = user.getPassword();
-        UserDto updateUser = userService.updateUser(user, username, email, user.getBalance(), password, user.getFavoriteItems(), profileLink, address, user.getNonce());
+        UserDto updateUser = userService.updateUser(user, username, email, user.getBalance(), password, user.getFavoriteItems(), profileLink, address, user.getPrivateKey());
         LOGGER.info("User {} has been updated", username);
         return ResponseEntity.ok().body(new Response(true, "Update user successfully!"));
     }
@@ -104,40 +102,4 @@ public class UserController {
         LOGGER.info("Profile image user {} has been updated", username);
         return ResponseEntity.ok().body(new Response(true, "Change profile image successfully!"));
     }
-
-
-
-//    @PostMapping("/register")
-//    public ResponseEntity registerUser(@RequestParam("id") Long id,
-//                                       @RequestParam("username") String username,
-//                                       @RequestParam("password") String password,
-//                                       @RequestParam("cfpassword") String cfpassword) {
-//        if (username.isEmpty()) {
-//            return new ResponseEntity<>("Vui lòng điền tên người dùng.", HttpStatus.BAD_GATEWAY);
-//        }
-//        if (password.isEmpty()) {
-//            return new ResponseEntity<>("Vui lòng nhập mật khẩu.", HttpStatus.BAD_GATEWAY);
-//        }
-//        if (cfpassword.isEmpty()) {
-//            return new ResponseEntity<>("Vui lòng xác nhận mật khẩu.", HttpStatus.BAD_GATEWAY);
-//        }
-//        if (!password.equals(cfpassword)) {
-//            return new ResponseEntity<>("Mật khẩu xác nhận chưa đúng.", HttpStatus.BAD_GATEWAY);
-//        }
-//        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-//        int user = userService.userRepository(id, username, hashedPassword);
-//        if (user != 1) {
-//            return new ResponseEntity<>("Đăng ký thất bại", HttpStatus.BAD_GATEWAY);
-//        } else {
-//            return new ResponseEntity<>("Đăng ký thành công.", HttpStatus.OK);
-//        }
-//    }
-//
-//
-//    @PostMapping("/bio")
-//    public ResponseEntity changeBio (@RequestParam("id") Long id,
-//                                     @RequestParam("bio") String bio) {
-//        userService.bioUser(id, bio);
-//        return new ResponseEntity<>("Đổi tiểu sử thành công.", HttpStatus.OK);
-//    }
 }

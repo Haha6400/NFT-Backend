@@ -3,6 +3,7 @@ package com.nftapp.nftapp.Service;
 import com.nftapp.nftapp.DTO.CollectionStatisticDto;
 import com.nftapp.nftapp.DTO.ItemDto;
 import com.nftapp.nftapp.Model.Item;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +16,9 @@ public interface ItemService {
     boolean deletePost(Long itemId);
     List<ItemDto> searchByTitle (String title);
     List<Item> getAllItems();
+    List<ItemDto> getAllItemsByCategory(String category);
     ItemDto getItemById (Long id);
     Item find(Long id);
+
+    Item save(ItemDto itemDto);
 }

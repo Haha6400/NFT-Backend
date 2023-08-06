@@ -37,7 +37,7 @@ import java.util.Map;
 CRUD COLLECTION
  */
 @RestController
-@RequestMapping("/collection")
+@RequestMapping("/openeye/collection")
 @Validated
 public class CollectionController {
     @Autowired
@@ -93,9 +93,11 @@ public class CollectionController {
                 .body(this.collectionService.insertCollection(collectionDto, image));
     }
 
-    @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Collection>> getAllCollection(){
-        return ResponseEntity.ok(this.collectionService.getAllCollections());
+    @GetMapping(value = "/all")
+    public ResponseEntity<?> getAllCollection(){
+        List<Collection> list = collectionService.getAllCollections();
+        Map<Object, Object> map = Map.of("total", list.size(), "collection", list);
+        return ResponseEntity.ok(map);
     }
 
     @GetMapping("/{id}")

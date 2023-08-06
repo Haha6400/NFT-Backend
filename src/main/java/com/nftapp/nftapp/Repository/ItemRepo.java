@@ -19,4 +19,6 @@ public interface ItemRepo extends JpaRepository<Item, Long>{
     List<Item> searchByTitle(@Param("key") String title);
 
     Item findAllById(Long id);
+
+    List<Item> getAllItemsByCategory(String category);
 }

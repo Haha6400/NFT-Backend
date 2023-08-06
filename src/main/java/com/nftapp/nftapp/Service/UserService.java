@@ -4,11 +4,15 @@ import com.nftapp.nftapp.DTO.UserDto;
 import com.nftapp.nftapp.Model.Item;
 import com.nftapp.nftapp.Model.User;
 import com.nftapp.nftapp.Repository.UserRepo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.security.SignatureException;
 import java.util.List;
 import java.util.Set;
 
@@ -29,4 +33,5 @@ public interface UserService extends UserDetailsService {
 
     UserDto updateProfileImage(User user, String image);
 
+//    public void findOneByAddress(String address, String signature, HttpServletRequest req, HttpServletResponse res) throws IOException, SignatureException;
 }

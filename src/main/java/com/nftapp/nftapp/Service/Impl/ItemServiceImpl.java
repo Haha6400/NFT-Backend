@@ -1,8 +1,10 @@
 package com.nftapp.nftapp.Service.Impl;
 
 import com.nftapp.nftapp.DTO.ItemDto;
+import com.nftapp.nftapp.Model.Category;
 import com.nftapp.nftapp.Model.Collection;
 import com.nftapp.nftapp.Model.Item;
+import com.nftapp.nftapp.Repository.CategoryRepo;
 import com.nftapp.nftapp.Repository.ItemRepo;
 import com.nftapp.nftapp.Repository.UserRepo;
 import com.nftapp.nftapp.Service.ItemService;
@@ -10,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
@@ -24,6 +27,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     public UserRepo userRepository;
+
+    @Autowired
+    public CategoryRepo categoryRepository;
 
     @Autowired
     public FileServiceImpl fileService;
@@ -52,6 +58,39 @@ public class ItemServiceImpl implements ItemService {
         item.setPictureLink(image);
         item.setCreatedDate(new Date());
         itemRepo.save(item);
+    }
+
+    @Override
+    public Item save(ItemDto itemDto){
+        Category category = categoryRepository.findByName(itemDto.getCategory());
+        if (category == null) {
+            category = new Category();
+            category.setName(itemDto.getCategory());
+            categoryRepository.save(category);
+        }
+        Item item = itemRepo.findAllById(itemDto.getId());
+        if (item == null) {
+            item = new Item();
+        }
+            item.setDescription(itemDto.getDescription());
+            item.setName(itemDto.getName());
+            item.setCreatedDate(new Date());
+            item.setCategory(itemDto.getCategory());
+            item.setPrice(itemDto.getPrice());
+            item.setStatus(itemDto.getStatus());
+            item.setOwner(itemDto.getOwner());
+            item.setPictureLink(item.getPictureLink());
+            itemRepo.save(item);
+        return item;
+    }
+
+
+    @Override
+    public List<ItemDto> getAllItemsByCategory(String category){
+        List<Item> items = itemRepo.getAllItemsByCategory(category);
+        return items.stream().map((item) ->
+                        this.modelMapper.map(item, ItemDto.class)).
+                collect(Collectors.toList());
     }
 
     @Override

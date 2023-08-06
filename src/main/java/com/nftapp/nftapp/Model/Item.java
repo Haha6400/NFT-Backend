@@ -23,6 +23,8 @@ public class Item {
     @NotBlank
     private String name;
 
+    private String category;
+
     private String description;
 
     private Double price;

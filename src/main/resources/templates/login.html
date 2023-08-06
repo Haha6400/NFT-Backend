@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Component</title>
+  <link rel="stylesheet" href="./Login.css">
+</head>
+<body>
+<div>
+  <p>
+    Please select your login method.
+    <br />
+    For the purpose of this demo, only MetaMask login is implemented.
+  </p>
+  <button class="Login-button Login-mm" onclick="handleClick()">
+    <span id="loginButtonText">Login with MetaMask</span>
+    <span id="loadingText" style="display:none;">Loading...</span>
+  </button>
+  <button class="Login-button Login-fb" disabled>Login with Facebook</button>
+  <button class="Login-button Login-email" disabled>Login with Email</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/web3@0.20.6/dist/web3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script >
+  async function handleClick() {
+    // Check if MetaMask is installed
+    if (!(window.ethereum || window.web3)) {
+      window.alert('Please install MetaMask first.');
+      return;
+    }
+
+    let web3;
+    if (!web3) {
+      try {
+        // Request account access if needed
+        await window.ethereum.enable();
+
+        // We don't know window.web3 version, so we use our own instance of Web3
+        // with the injected provider given by MetaMask
+        // web3 = new Web3(window.ethereum || window.web3.currentProvider);
+        var Web3 = require('web3');
+        web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8019'));
+      } catch (error) {
+        window.alert(error.toString());
+        // window.alert('You need to allow MetaMask.');
+        return;
+      }
+    }
+
+    // try{
+    //   const coinbase = await web3.eth.getCoinbase();
+    // } catch ( error) {
+    //   window.alert(error.toString());
+    // }
+    const coinbase = await web3.eth.getCoinbase();
+    if (!coinbase) {
+      window.alert('Please activate MetaMask first.');
+      return;
+    }
+
+    const publicAddress = coinbase.toLowerCase();
+    const loadingButton = document.getElementById('loginButtonText');
+    const loadingText = document.getElementById('loadingText');
+    loadingButton.style.display = 'none';
+    loadingText.style.display = 'inline';
+
+    try {
+      // Look if user with current publicAddress is already present on backend
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users?publicAddress=${publicAddress}`);
+      const users = await response.json();
+      const user = users.length ? users[0] : await handleSignup(publicAddress);
+      const { signature } = await handleSignMessage({ publicAddress, nonce: 'nonce' });
+      const authResponse = await axios.post('/api/create', {
+        signature: signature,
+        publicAddress: publicAddress
+      });
+      onLoggedIn(authResponse.username);
+    } catch (err) {
+      window.alert(err);
+    } finally {
+      loadingButton.style.display = 'inline';
+      loadingText.style.display = 'none';
+    }
+  }
+
+  async function handleSignMessage({ publicAddress, nonce }) {
+    try {
+      const signature = await web3.eth.personal.sign(
+              `I am signing my one-time nonce: ${nonce}`,
+              publicAddress,
+              '' // MetaMask will ignore the password argument here
+      );
+      return { publicAddress, signature };
+    } catch (err) {
+      throw new Error('You need to sign the message to be able to log in.');
+    }
+  }
+
+  async function handleSignup(publicAddress) {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users`, {
+      body: JSON.stringify({ publicAddress }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    });
+    return await response.json();
+  }
+
+  async function handleAuthenticate({ publicAddress, signature }) {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/auth`, {
+      body: JSON.stringify({ publicAddress, signature }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'POST'
+    });
+    return await response.json();
+  }
+</script>
+</body>
+</html>

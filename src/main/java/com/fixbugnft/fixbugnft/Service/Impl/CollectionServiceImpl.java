@@ -1,0 +1,99 @@
+package com.fixbugnft.fixbugnft.Service.Impl;
+
+
+import com.fixbugnft.fixbugnft.DTO.CollectionDto;
+import com.fixbugnft.fixbugnft.Model.Collection;
+import com.fixbugnft.fixbugnft.Repository.CategoryRepo;
+import com.fixbugnft.fixbugnft.Repository.CollectionRepo;
+import com.fixbugnft.fixbugnft.Repository.UserRepo;
+import com.fixbugnft.fixbugnft.Service.CollectionService;
+import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class CollectionServiceImpl implements CollectionService {
+    private CollectionRepo collectionRepo;
+
+    public ModelMapper modelMapper;
+    public UserRepo userRepo;
+
+    public FileServiceImpl fileService;
+    @Value("${project.image}")
+    private String path;
+
+    @Transactional
+    @Override
+    public CollectionDto insertCollection(CollectionDto collectionDto, MultipartFile image) throws Exception {
+        Collection collection = this.modelMapper.map(collectionDto, Collection.class);
+        String fileName = fileService.updateFile(path, image);
+        BeanUtils.copyProperties(this, collection);
+        collection.setPictureLink(fileName);
+        collection.setCreatedDate(new Date());
+        Collection newCollection = collectionRepo.save(collection);
+        return this.modelMapper.map(newCollection, CollectionDto.class);
+    }
+
+    @Override
+    public void saveCollection(Collection collectionDto, String image) {
+        Collection collection = this.modelMapper.map(collectionDto, Collection.class);
+        collection.setPictureLink(image);
+        collection.setCreatedDate(new Date());
+        collectionRepo.save(collection);
+    }
+
+    @Override
+    public Collection save(CollectionDto collectionDto){
+        Collection collection = collectionRepo.findAllById(collectionDto.getId());
+        if (collection == null) {
+            collection = new Collection();
+        }
+        collection.setDescription(collectionDto.getDescription());
+        collection.setName(collectionDto.getName());
+        collection.setCreatedDate(new Date());
+        collection.setVolume(collectionDto.getVolume());
+        collection.setPictureLink(collection.getPictureLink());
+        collectionRepo.save(collection);
+        return collection;
+    }
+
+    @Override
+    public boolean deleteCollection(Long collectionId) {
+        return false;
+    }
+
+    @Override
+    public List<CollectionDto> searchByTitle(String title) {
+        List<Collection> collections = collectionRepo.searchByName("%" + title + "%");
+        return collections.stream().map((post) ->
+                        this.modelMapper.map(post, CollectionDto.class)).
+                collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Collection> getAllCollections() {
+//        CollectionQueryCondParam param = new CollectionQueryCondParam();
+//        return collectionRepo.findAll(param.buildSpecification(),
+//                Sort.by(Sort.Order.desc("createTime")));
+        return collectionRepo.findAll();
+    }
+
+    @Override
+    public CollectionDto getCollectionById(Long id) {
+        Collection collection = collectionRepo.findAllById(id);
+        return this.modelMapper.map(collection, CollectionDto.class);
+    }
+
+    @Override
+    public Collection find(Long id) {
+        return collectionRepo.findAllById(id);
+    }
+
+}

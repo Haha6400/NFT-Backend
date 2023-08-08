@@ -86,11 +86,9 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public List<ItemDto> getAllItemsByCategory(String category){
-        List<Item> items = itemRepo.getAllItemsByCategory(category);
-        return items.stream().map((item) ->
-                        this.modelMapper.map(item, ItemDto.class)).
-                collect(Collectors.toList());
+    public List<Item> getAllItemsByCategory(String category){
+        return itemRepo.getAllItemsByCategory(category);
+
     }
 
     @Override
@@ -104,11 +102,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchByTitle(String title) {
-        List<Item> items = itemRepo.searchByTitle("%" + title + "%");
-        return items.stream().map((post) ->
-                        this.modelMapper.map(post, ItemDto.class)).
-                collect(Collectors.toList());
+    public List<Item> searchByTitle(String title) {
+        return  itemRepo.searchByTitle("%" + title + "%");
+
     }
 
     @Override
@@ -125,6 +121,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item find(Long id) {
         return itemRepo.findAllById(id);
+    }
+
+    @Override
+    public Item getAllItemsByOfferListId (Long offerListId){
+        return itemRepo.getAllItemsByOfferListId(offerListId);
     }
 
 }

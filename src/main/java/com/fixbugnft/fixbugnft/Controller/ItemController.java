@@ -38,10 +38,8 @@ public class ItemController {
     private String path;
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllItem(){
-        List<Item> itemList = itemService.getAllItems();
-        Map<Object, Object> map = Map.of("total", itemList.size(), "items", itemList);
-        return ResponseEntity.ok(map);
+    public List<Item> getAllItem(){
+        return itemService.getAllItems();
     }
 
     @GetMapping("/{id}")
@@ -50,10 +48,8 @@ public class ItemController {
     }
 
     @GetMapping("/{category}")
-    public ResponseEntity<?> listItemByCategory(@PathVariable("category") String category){
-        List<ItemDto> itemDtoList = itemService.getAllItemsByCategory(category);
-        Map<Object, Object> map = Map.of("total", itemDtoList.size(), "itemList", itemDtoList);
-        return ResponseEntity.ok(map);
+    public List<Item> listItemByCategory(@PathVariable("category") String category){
+        return itemService.getAllItemsByCategory(category);
     }
     @PostMapping("/save")
     public Item createItem(@RequestPart String name,
@@ -98,10 +94,8 @@ public class ItemController {
     }
 
     @GetMapping("/{name}")
-    public ResponseEntity<?> searchItemByName(@PathVariable("name") String name){
-        List<ItemDto> itemDtoList = itemService.searchByTitle(name);
-        Map<Object, Object> map = Map.of("total", itemDtoList.size(), "items", itemDtoList);
-        return ResponseEntity.ok(map);
+    public List<Item> searchItemByName(@PathVariable("name") String name){
+        return itemService.searchByTitle(name);
     }
 
     //Image upload

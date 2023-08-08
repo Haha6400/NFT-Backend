@@ -35,10 +35,8 @@ public class UserController {
     private final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/all")
-    public ResponseEntity<?> getUserList() {
-        List<UserDto> users = userService.getAllUsers();
-        Map<Object, Object> map = Map.of("total", users.size(), "userList", users);
-        return ResponseEntity.ok(map);
+    public List<User> getUserList() {
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{username}")

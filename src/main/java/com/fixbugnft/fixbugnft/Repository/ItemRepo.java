@@ -21,4 +21,6 @@ public interface ItemRepo extends JpaRepository<Item, Long>{
 
     List<Item> getAllItemsByCategory(String category);
 
+    Item getAllItemsByOfferListId (Long OfferListId);
+
 }

@@ -7,8 +7,6 @@ import com.fixbugnft.fixbugnft.Repository.UserRepo;
 import com.fixbugnft.fixbugnft.Service.UserService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -51,6 +47,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByAddress(address);
     }
 
+    @Override
+    public User findById(Long id) {
+        return userRepository.getById(id);
+    }
+
 
     @Override
     public UserDto updateUser(User user, String username, String email, BigDecimal balance, String password, String profileLink,  String private_key) {
@@ -71,11 +72,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUsers() {
-        List<User> userList = (List<User>) userRepository.findAll();
-        return userList.stream().map((post) ->
-                        this.modelMapper.map(post, UserDto.class)).
-                collect(Collectors.toList());
+    public List<User> getAllUsers() {
+//        List<User> userList = (List<User>) userRepository.findAll();
+//        return userList.stream().map((post) ->
+//                        this.modelMapper.map(post, UserDto.class)).
+//                collect(Collectors.toList());
+        return userRepository.findAll();
     }
 
     @Override

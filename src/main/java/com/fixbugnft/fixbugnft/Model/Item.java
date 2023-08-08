@@ -42,6 +42,8 @@ public class Item {
 
     private Long ownerId;
 
+    private Long offerListId;
+
 //    @OneToMany
 //    @JoinColumn(name = "offerList_id")
 //    private Set<Offer> offerList = new HashSet<>();

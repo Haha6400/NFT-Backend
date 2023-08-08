@@ -15,10 +15,12 @@ public interface ItemService {
     void saveImage(ItemDto itemDto, String image);
     void saveItem(Item item, String image);
     boolean deletePost(Long itemId);
-    List<ItemDto> searchByTitle (String title);
+    List<Item> searchByTitle (String title);
     List<Item> getAllItems();
-    List<ItemDto> getAllItemsByCategory(String category);
+    List<Item> getAllItemsByCategory(String category);
     ItemDto getItemById (Long id);
     Item find(Long id);
     Item save(ItemDto itemDto);
+
+    Item getAllItemsByOfferListId (Long offerListId);
 }

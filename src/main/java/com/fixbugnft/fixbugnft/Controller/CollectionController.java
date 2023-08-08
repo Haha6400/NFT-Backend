@@ -41,10 +41,8 @@ public class CollectionController {
     CollectionRepo collectionRepo;
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllCollection(){
-        List<Collection> collectionList = collectionService.getAllCollections();
-        Map<Object, Object> map = Map.of("total", collectionList.size(), "collections", collectionList);
-        return ResponseEntity.ok(map);
+    public List<Collection> getAllCollection(){
+        return collectionService.getAllCollections();
     }
 
     @GetMapping("/{id}")
@@ -90,10 +88,8 @@ public class CollectionController {
         this.collectionService.deleteCollection(id);
     }
     @GetMapping("/{name}")
-    public ResponseEntity<?> searchCollectionByName(@PathVariable("name") String name){
-        List<CollectionDto> collectionDtoList = collectionService.searchByTitle(name);
-        Map<Object, Object> map = Map.of("total", collectionDtoList.size(), "collections", collectionDtoList);
-        return ResponseEntity.ok(map);
+    public List<CollectionDto> searchCollectionByName(@PathVariable("name") String name){
+        return collectionService.searchByTitle(name);
     }
 
 
